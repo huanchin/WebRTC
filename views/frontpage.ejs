@@ -128,6 +128,15 @@
         const pc = document.getElementById("startpc").value;
         location.assign("/newroom?username=" + un + "&passcode=" + pc);
       }
+
+      function joinRoom() {
+        const un = document.getElementById("joinun").value;
+        const inv = document.getElementById("joininv").value;
+        const pc = document.getElementById("joinpc").value;
+        location.assign(
+          "/joinroom?username=" + un + "&invitation=" + inv + "&passcode=" + pc
+        );
+      }
     </script>
   </body>
 </html>
