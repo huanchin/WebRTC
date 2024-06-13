@@ -224,6 +224,13 @@
 
       const ROOM_ID = "<%= roomId %>";
       const USERNAME = "<%= username %>";
+
+      function fullscreen() {
+        const mainVideo = document.getElementById("main-video");
+        if (mainVideo.requestFullscreen) {
+          mainVideo.requestFullscreen();
+        }
+      }
     </script>
     <script src="webrtc-controller.js"></script>
   </body>
