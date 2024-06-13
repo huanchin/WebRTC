@@ -123,6 +123,11 @@
       function flipToFront() {
         document.getElementById("form").style.transform = "rotateY(0deg)";
       }
+      function newRoom() {
+        const un = document.getElementById("startun").value;
+        const pc = document.getElementById("startpc").value;
+        location.assign("/newroom?username=" + un + "&passcode=" + pc);
+      }
     </script>
   </body>
 </html>
