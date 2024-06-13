@@ -26,6 +26,28 @@ app.get("/newroom", (req, res) => {
   res.redirect(`/${roomId}`);
 });
 
+//*** 3) handle join room route ***/
+app.get("/joinroom", (req, res) => {
+  const { username, invitation, passcode } = req.query;
+  const log = fs.readFileSync("public/meeting-log.txt", "utf-8");
+  let findInvitation = log.indexOf(`${invitation}:${passcode}`);
+  if (findInvitation !== -1) {
+    un = username;
+    pc = passcode;
+    res.redirect(`/${invitation}`);
+  } else {
+    findInvitation = log.indexOf(`${invitation}`);
+    if (findInvitation == -1) {
+      res.send("Invalid invitation. Please <a href=/>go back</a>");
+    } else {
+      const findPassCode = log.indexOf(invitation + ":" + passcode);
+      if (findPassCode == -1) {
+        res.send("Invalid password. Please <a href=/>go back</a>");
+      }
+    }
+  }
+});
+
 //*** 2) handle room route ***/
 app.get("/:room", (req, res) => {
   res.render("meeting-room", {
