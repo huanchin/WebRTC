@@ -4,8 +4,12 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>WebRTC Video Conference</title>
-    <link rel="icon" type="image/x-icon" href="image-assets/logo-favicon.png" />
-    <link rel="stylesheet" href="css/style-frontpage.css" />
+    <link
+      rel="icon"
+      type="image/x-icon"
+      href="../public/image-assets/logo-favicon.png"
+    />
+    <link rel="stylesheet" href="../public/css/style-frontpage.css" />
   </head>
 
   <body>
@@ -116,6 +120,13 @@
     </div>
     <!--End of container-->
 
-    <script></script>
+    <script>
+      function flipToBack() {
+        document.getElementById("form").style.transform = "rotateY(180deg)";
+      }
+      function flipToFront() {
+        document.getElementById("form").style.transform = "rotateY(0deg)";
+      }
+    </script>
   </body>
 </html>
