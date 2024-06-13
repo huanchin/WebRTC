@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WebRTC Video Conference</title>
+    <link rel="icon" type="image/x-icon" href="image-assets/logo-favicon.png" />
+    <link rel="stylesheet" href="css/style-room.css" />
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://unpkg.com/peerjs@1.3.1/dist/peerjs.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+  </head>
+
+  <body>
+    <div class="container">
+      <div id="form" class="glow">
+        <div id="content">
+          <div class="left-content">
+            <div class="top-left">
+              <div class="logo">
+                <img
+                  src="image-assets/logo.png"
+                  style="height: 35px; margin-top: 12px"
+                />
+              </div>
+              <!--End of logo-->
+              <div class="header">
+                <p
+                  style="
+                    margin: 0px;
+                    padding: 12px 0px 0px 10px;
+                    font-weight: bold;
+                  "
+                >
+                  A WebRTC Video Conference App
+                </p>
+                <p
+                  id="date"
+                  style="
+                    margin: 0px;
+                    padding: 0px 0px 0px 10px;
+                    font-size: 10pt;
+                  "
+                >
+                  Sunday, 1 Jan 2023
+                </p>
+                <span id="power" onclick="leaveMeeting()">
+                  <i class="material-icons">&#xe8ac;</i>
+                </span>
+              </div>
+              <!--End of header-->
+            </div>
+            <!--End of top-left-->
+            <div class="middle-left">
+              <video
+                id="main-video"
+                title="Double click to display fullscreen."
+                ondblclick="fullscreen()"
+                autoplay
+              ></video>
+              <div id="video-grid"></div>
+              <!--End of video-grid-->
+            </div>
+            <!--End of middle-left-->
+            <div id="bot-left">
+              <div class="command-btn" id="audioControl" onclick="muteUnmute()">
+                <i class="material-icons">&#xe029;</i>
+                <p class="label">Mic</p>
+              </div>
+              <div class="command-btn" id="videoControl" onclick="playStop()">
+                <i class="material-icons">&#xe04b;</i>
+                <p class="label">Cam</p>
+              </div>
+              <div
+                class="command-btn"
+                id="shareControl"
+                onclick="shareScreen()"
+              >
+                <i class="material-icons">&#xe0df;</i>
+                <p class="label" id="shareText">Share</p>
+              </div>
+              <div
+                class="command-btn"
+                id="recordControl"
+                onclick="recordMeeting()"
+              >
+                <i class="material-icons">&#xe061;</i>
+                <p class="label">Record</p>
+              </div>
+            </div>
+            <!--End of bot-left-->
+          </div>
+          <!--End of left-content-->
+          <div id="right-content">
+            <p
+              style="
+                margin: 15px;
+                padding: 12px 0px 0px 10px;
+                font-weight: bold;
+                color: #202020;
+              "
+            >
+              Chat with Friends
+            </p>
+            <div class="active"></div>
+            <div id="info">
+              <p
+                style="
+                  color: #ffffff;
+                  font-size: 11pt;
+                  padding: 10px 0px 0px 12px;
+                "
+              >
+                People in room:
+              </p>
+              <p
+                style="color: #ffffff; font-size: 50pt; padding-left: 120px"
+                id="participant"
+              >
+                4
+              </p>
+              <i
+                class="material-icons"
+                style="
+                  color: #ffffff;
+                  font-size: 40px;
+                  position: relative;
+                  bottom: 47px;
+                  left: 228px;
+                "
+                >&#xe7fd;</i
+              >
+            </div>
+            <!--End of info-->
+            <div id="chatroom"></div>
+            <!--End of chatroom-->
+            <div id="chatform">
+              <label>
+                <input
+                  type="file"
+                  id="file"
+                  style="display: none"
+                  onchange="selectFile(this.value)"
+                />
+                <i
+                  class="material-icons"
+                  style="
+                    font-size: 18px;
+                    color: #4f4f4f;
+                    float: left;
+                    margin-left: 10px;
+                    margin-top: 15px;
+                    transform: rotate(45deg);
+                    cursor: pointer;
+                  "
+                  >&#xe226;</i
+                >
+              </label>
+              <input id="textchat" type="text" placeholder="Type here ..." />
+              <button
+                id="sendMessage"
+                style="
+                  background-color: #fd6f13;
+                  border: none;
+                  margin-left: 8px;
+                  padding: 4px 3px 2px 3px;
+                  margin-top: 8px;
+                  border-radius: 6px;
+                  cursor: pointer;
+                "
+              >
+                <i
+                  class="material-icons"
+                  style="color: #ffffff; font-size: 25px; font-weight: bold"
+                  >&#xe315;</i
+                >
+              </button>
+            </div>
+            <!--End of chatform-->
+          </div>
+          <!--End of right-content-->
+        </div>
+        <!--End of content-->
+      </div>
+      <!--End of form-->
+    </div>
+    <!--End of container-->
+
+    <script></script>
+    <script src="webrtc-controller.js"></script>
+  </body>
+</html>

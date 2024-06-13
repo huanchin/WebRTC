@@ -1,0 +1,145 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    background: url("/image-assets/background.jpg") no-repeat center;
+    background-size: 100%;
+    width: 100%;
+    height: 100%;
+    font-family: 'Trebuchet MS', sans-serif;
+}
+
+#container {
+    width: 350px;
+    height: 500px;
+    border-radius: 10px;
+    text-align: center;
+    position: absolute;
+    margin: auto;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    perspective: 800px;
+}
+
+#form {
+    width: 100%;
+    height: 100%;
+    box-shadow: 20px 20px 22px rgba(0, 0, 0, 0.2);
+    position: relative;
+    transform-style: preserve-3d;
+    transition: 1s ease-in;
+}
+
+.front {
+    position: relative;
+    backface-visibility: hidden;
+    transform-style: preserve-3d;
+}
+
+.top-content {
+    float: left;
+    width: 100%;
+    height: 400px;
+    background-color: rgba(255, 255, 255, 0.07);
+    backdrop-filter: blur(10px);
+    border-radius: 10px 10px 0px 0px;
+}
+
+.bot-content {
+    float: left;
+    width: 100%;
+    height: 100px;
+    background-color: #fd6f13;
+    border-radius: 0px 0px 10px 10px;
+    border-top: 2px solid white;
+}
+
+p {
+    color: white;
+    padding-left: 20px;
+    padding-right: 20px;
+    font-size: 16px;
+}
+
+.textfield {
+    width: 198px;
+    border: none;
+    border-radius: 25px;
+    font-size: 14px;
+    color: white;
+    background-color: rgba(255, 255, 255, 0.3);
+    background-repeat: no-repeat;
+    background-position: 10px 10px;
+    padding: 12px 12px 12px 40px;
+    margin-bottom: 10px;
+    border: 2px solid #ffffff;
+}
+
+.textfield:focus {
+    outline: none;
+}
+
+::placeholder {
+    color: #ebebeb;
+}
+
+.nameIcon {
+    background-image: url('/image-assets/icon-user.png');
+}
+
+.passIcon {
+    background-image: url('/image-assets/icon-pass.png');
+}
+
+.inviteIcon {
+    background-image: url('/image-assets/icon-anchor.png');
+}
+
+.start,
+.join {
+    width: 250px;
+    border: 2px solid #ffffff;
+    border-radius: 25px;
+    background-color: #fd6f13;
+    color: white;
+    padding: 13px 32px;
+    text-decoration: none;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+#or {
+    width: 17px;
+    height: 13px;
+    margin: 0;
+    padding: 6px 9px 8px 8px;
+    color: #fd6f13;
+    font-size: 14px;
+    border: 2px solid #fd6f13;
+    background-color: #ffffff;
+    text-align: center;
+    vertical-align: middle;
+    border-radius: 30px;
+    position: relative;
+    left: 158px;
+}
+
+.or-start {
+    top: 58px;
+}
+
+.or-join {
+    top: 23px;
+}
+
+.back {
+    position: relative;
+    backface-visibility: hidden;
+    transform-style: preserve-3d;
+    bottom: 502px;
+    transform: rotateY(180deg);
+}

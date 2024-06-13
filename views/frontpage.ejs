@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WebRTC Video Conference</title>
+    <link rel="icon" type="image/x-icon" href="image-assets/logo-favicon.png" />
+    <link rel="stylesheet" href="css/style-frontpage.css" />
+  </head>
+
+  <body>
+    <div id="container">
+      <div id="form">
+        <div class="front">
+          <div class="top-content">
+            <br /><br />
+            <h3 style="color: #fd6f13">START MEETING</h3>
+            <br />
+            <p>
+              Create room and meet people. <br />
+              <b>It's free!</b>
+            </p>
+            <br /><br /><br />
+            <input
+              class="textfield nameIcon"
+              id="startun"
+              type="text"
+              placeholder="Enter name ..."
+            />
+            <input
+              class="textfield passIcon"
+              id="startpc"
+              type="password"
+              placeholder="Create passcode ..."
+            />
+            <input
+              class="start"
+              type="button"
+              value="GO !"
+              onclick="newRoom()"
+            />
+            <p id="or" class="or-start">OR</p>
+          </div>
+          <!--End of top-content-->
+          <div class="bot-content">
+            <br /><br />
+            <p style="color: #ffffff">
+              Invited to a meeting?
+              <a
+                href="#"
+                onclick="flipToBack()"
+                style="color: #ffffff; font-weight: bold; text-decoration: none"
+              >
+                Join now.
+              </a>
+            </p>
+          </div>
+          <!--End of bot-content-->
+        </div>
+        <!--End of front-->
+        <div class="back">
+          <div class="top-content">
+            <br /><br />
+            <h3 style="color: #fd6f13">JOIN MEETING</h3>
+            <br />
+            <p>
+              Enter invitation and meet people. <br />
+              <b style="color: #fefefe">It's free!</b>
+            </p>
+            <br /><br />
+            <input
+              class="textfield nameIcon"
+              id="joinun"
+              type="text"
+              placeholder="Enter name ..."
+            />
+            <input
+              class="textfield inviteIcon"
+              id="joininv"
+              type="text"
+              placeholder="Your invitation ..."
+            />
+            <input
+              class="textfield passIcon"
+              id="joinpc"
+              type="password"
+              placeholder="Use passcode ..."
+            />
+            <input
+              class="join"
+              type="button"
+              value="GO !"
+              onclick="joinRoom()"
+            />
+            <p id="or" class="or-join">OR</p>
+          </div>
+          <!--End of back top-content-->
+          <div class="bot-content">
+            <br /><br />
+            <p style="color: #ffffff">
+              Create new meeting?
+              <a
+                href="#"
+                onclick="flipToFront()"
+                style="color: #ffffff; font-weight: bold; text-decoration: none"
+              >
+                Start now.
+              </a>
+            </p>
+          </div>
+          <!--End of back bot-content-->
+        </div>
+        <!--End of back-->
+      </div>
+      <!--End of form-->
+    </div>
+    <!--End of container-->
+
+    <script></script>
+  </body>
+</html>
