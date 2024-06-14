@@ -1,5 +1,6 @@
 /****** 1) Get User Media ******/
 const videoGrid = document.getElementById("video-grid");
+let myVideoStream;
 async function getMedia() {
   try {
     const stream = await navigator.mediaDevices.getUserMedia({
@@ -97,23 +98,13 @@ const connecToOther = (peerId, stream) => {
 
 // C) if you join a new room
 //Execute this callback function when there is a call from another peer
-let myVideoStream1;
 peer.on("call", (call) => {
-  // get local media stream
-  navigator.mediaDevices
-    .getUserMedia({
-      video: true,
-      audio: true,
-    })
-    .then((stream) => {
-      myVideoStream1 = stream;
-      // answer and send local stream to another peer
-      call.answer(stream);
-      const conn = peer.connect(call.peer);
-      conn.on("open", function () {
-        conn.send(myPeerId + "," + USERNAME);
-      });
-    });
+  // answer and send local stream to another peer
+  call.answer(myVideoStream);
+  const conn = peer.connect(call.peer);
+  conn.on("open", function () {
+    conn.send(myPeerId + "," + USERNAME);
+  });
 
   if (peerList.hasOwnProperty(call.peer) == false) {
     let i = 1;
@@ -143,3 +134,24 @@ peer.on("connection", function (conn) {
     document.getElementById(message[0]).innerHTML = message[1];
   });
 });
+
+/*** Feature ***/
+/*** microphone control ***/
+function muteUnmute() {
+  const enabled = myVideoStream.getAudioTracks()[0].enabled;
+  if (enabled) {
+    const html = `
+              <i class="material-icons">&#xe02b;</i>
+              <p class="label">Mic</p>
+              `;
+    document.getElementById("audioControl").innerHTML = html;
+    myVideoStream.getAudioTracks()[0].enabled = false;
+  } else {
+    const html = `
+              <i class="material-icons">&#xe029;</i>
+              <p class="label">Mic</p>
+              `;
+    document.getElementById("audioControl").innerHTML = html;
+    myVideoStream.getAudioTracks()[0].enabled = true;
+  }
+}
