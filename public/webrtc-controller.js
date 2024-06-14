@@ -114,7 +114,24 @@ peer.on("call", (call) => {
         conn.send(myPeerId + "," + USERNAME);
       });
     });
-  peerList[call.peer] = "";
+
+  if (peerList.hasOwnProperty(call.peer) == false) {
+    let i = 1;
+    call.on("stream", (userVideoStream) => {
+      if (i <= 1) {
+        addVideo(call.peer, "", userVideoStream);
+      }
+      i++;
+    });
+    peerList[call.peer] = "";
+  } else {
+    call.on("stream", (userVideoStream) => {
+      changeMainVideo(userVideoStream);
+      streamBack = userVideoStream;
+      document.getElementById("shareControl").onclick = getSharedVideo;
+      document.getElementById("shareText").innerHTML = "Back in";
+    });
+  }
 });
 
 /**** After peer data connection is established ****/
