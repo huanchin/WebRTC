@@ -55,3 +55,27 @@ app.get("/:room", (req, res) => {
     username: un,
   });
 });
+
+//*** 4) Initialize connection for meeting ***/
+
+/*** Importing and Setting Up the Express Peer Server ***/
+const { ExpressPeerServer } = require("peer");
+/*** creates a PeerJS server instance using ExpressPeerServer ***/
+const peerServer = ExpressPeerServer(server, {
+  debug: true,
+});
+/*** Integrating the PeerJS Server with an Express Application ***/
+// This line tells the Express application to use the PeerJS server at the /peerjs path
+// any requests to /peerjs on your server will be handled by the PeerJS server
+app.use("/peerjs", peerServer);
+
+/**** Setting Up Socket.IO ****/
+const io = require("socket.io")(server);
+
+// triggered when there is user connected to server
+io.on("connection", (socket) => {
+  socket.on("join-room", (roomId, peerId) => {
+    socket.join(roomId);
+    socket.to(roomId).emit("user-connected", peerId);
+  });
+});
