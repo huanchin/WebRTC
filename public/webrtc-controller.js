@@ -84,6 +84,7 @@ const connecToOther = (peerId, stream) => {
   // get new user's stream
   call.on("stream", (userVideoStream) => {
     if (i <= 1) {
+      // add new user's stream to my local
       addVideo(call.peer, "", userVideoStream);
       const conn = peer.connect(peerId);
       conn.on("open", function () {
@@ -114,4 +115,14 @@ peer.on("call", (call) => {
       });
     });
   peerList[call.peer] = "";
+});
+
+/**** After peer data connection is established ****/
+// if you receive data(peerId and username) from other peer
+peer.on("connection", function (conn) {
+  conn.on("data", function (data) {
+    const message = data.split(",");
+    peerList[message[0]] = message[1];
+    document.getElementById(message[0]).innerHTML = message[1];
+  });
 });
