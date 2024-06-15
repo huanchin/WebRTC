@@ -77,5 +77,9 @@ io.on("connection", (socket) => {
   socket.on("join-room", (roomId, peerId) => {
     socket.join(roomId);
     socket.to(roomId).emit("user-connected", peerId);
+
+    socket.on("stop-screen-share", (peerId) => {
+      io.to(roomId).emit("no-share", peerId);
+    });
   });
 });

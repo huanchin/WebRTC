@@ -1,3 +1,9 @@
+/*** share screen variables ***/
+let shareState = 0;
+let videoTrack;
+let streamBack;
+let sharedStream;
+
 /****** 1) Get User Media ******/
 const videoGrid = document.getElementById("video-grid");
 let myVideoStream;
@@ -9,7 +15,7 @@ async function getMedia() {
       video: true,
     });
     myVideoStream = stream;
-    console.log("get media:", myVideoStream);
+    // for debug: console.log("get media:", myVideoStream);
     addVideo("my-label-mini-vid", USERNAME, myVideoStream);
     changeMainVideo(stream);
   } catch (err) {}
@@ -96,12 +102,18 @@ const connecToOther = (peerId, stream) => {
     }
     i++;
   });
+
+  // when new user joins
+  // if you are sharing screen, let him know your shared screen
+  if (shareState == 1) {
+    const call1 = peer.call(peerId, sharedStream);
+  }
 };
 
 // C) if you join a new room
 //Execute this callback function when there is a call from another peer
 peer.on("call", (call) => {
-  console.log("on call: ", myVideoStream);
+  //for debug: console.log("on call: ", myVideoStream);
   // answer and send local stream to another peer
   navigator.mediaDevices
     .getUserMedia({
@@ -110,7 +122,7 @@ peer.on("call", (call) => {
     })
     .then((stream) => {
       //myVideoStream = stream;
-      console.log("after getting stream");
+      // for debug: console.log("after getting stream");
       call.answer(myVideoStream);
       var conn = peer.connect(call.peer);
       conn.on("open", function () {
@@ -128,6 +140,8 @@ peer.on("call", (call) => {
     });
     peerList[call.peer] = "";
   } else {
+    // if peerId from other call already exist in your peerList,
+    // means that that call is a call for shared screen
     call.on("stream", (userVideoStream) => {
       changeMainVideo(userVideoStream);
       streamBack = userVideoStream;
@@ -186,4 +200,64 @@ function playStop() {
    `;
     document.getElementById("videoControl").innerHTML = html;
   }
+}
+
+/*** Share screen ***/
+function shareScreen() {
+  if (shareState == 0) {
+    startShareScreen();
+  } else {
+    stopShareScreen();
+  }
+}
+
+function startShareScreen() {
+  navigator.mediaDevices
+    .getDisplayMedia({
+      video: {
+        cursor: "always",
+      },
+      audio: {
+        echoCancellation: true,
+        noiseSuppression: true,
+      },
+    })
+    .then((stream) => {
+      sharedStream = stream;
+      shareState = 1;
+      document.getElementById("shareControl").style.color = "#fd6f13";
+      // var peerToCall = Object.keys(peerList) + "";
+      // const peerArray = peerToCall.split(",");
+      const peerArray = Object.keys(peerList);
+      for (let i = 1; i <= peerArray.length; i++) {
+        const call = peer.call(peerArray[i], stream);
+        changeMainVideo(stream);
+      }
+      videoTrack = stream.getVideoTracks()[0];
+      videoTrack.onended = function () {
+        stopShareScreen();
+      };
+    })
+    .catch((err) => {
+      console.log("unable to share screen " + err);
+    });
+}
+
+function stopShareScreen() {
+  shareState = 0;
+  document.getElementById("shareControl").style.color = "#000000";
+  videoTrack.stop();
+  changeMainVideo(myVideoStream);
+  socket.emit("stop-screen-share", myPeerId);
+}
+
+/*** when other user stop sharing screen ***/
+socket.on("no-share", (peerId) => {
+  changeMainVideo(myVideoStream);
+  document.getElementById("shareControl").onclick = shareScreen;
+  document.getElementById("shareText").innerHTML = "Share";
+});
+
+function getSharedVideo() {
+  changeMainVideo(streamBack);
 }
