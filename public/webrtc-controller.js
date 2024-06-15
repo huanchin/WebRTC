@@ -100,11 +100,19 @@ const connecToOther = (peerId, stream) => {
 //Execute this callback function when there is a call from another peer
 peer.on("call", (call) => {
   // answer and send local stream to another peer
-  call.answer(myVideoStream);
-  const conn = peer.connect(call.peer);
-  conn.on("open", function () {
-    conn.send(myPeerId + "," + USERNAME);
-  });
+  navigator.mediaDevices
+    .getUserMedia({
+      video: true,
+      audio: true,
+    })
+    .then((stream) => {
+      //myVideoStream = stream;
+      call.answer(myVideoStream);
+      var conn = peer.connect(call.peer);
+      conn.on("open", function () {
+        conn.send(myPeerId + "," + USERNAME);
+      });
+    });
 
   if (peerList.hasOwnProperty(call.peer) == false) {
     let i = 1;
