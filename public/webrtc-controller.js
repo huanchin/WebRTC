@@ -1,6 +1,7 @@
 /****** 1) Get User Media ******/
 const videoGrid = document.getElementById("video-grid");
 let myVideoStream;
+
 async function getMedia() {
   try {
     const stream = await navigator.mediaDevices.getUserMedia({
@@ -8,6 +9,7 @@ async function getMedia() {
       video: true,
     });
     myVideoStream = stream;
+    console.log("get media:", myVideoStream);
     addVideo("my-label-mini-vid", USERNAME, myVideoStream);
     changeMainVideo(stream);
   } catch (err) {}
@@ -99,6 +101,7 @@ const connecToOther = (peerId, stream) => {
 // C) if you join a new room
 //Execute this callback function when there is a call from another peer
 peer.on("call", (call) => {
+  console.log("on call: ", myVideoStream);
   // answer and send local stream to another peer
   navigator.mediaDevices
     .getUserMedia({
@@ -107,6 +110,7 @@ peer.on("call", (call) => {
     })
     .then((stream) => {
       //myVideoStream = stream;
+      console.log("after getting stream");
       call.answer(myVideoStream);
       var conn = peer.connect(call.peer);
       conn.on("open", function () {
@@ -161,5 +165,25 @@ function muteUnmute() {
               `;
     document.getElementById("audioControl").innerHTML = html;
     myVideoStream.getAudioTracks()[0].enabled = true;
+  }
+}
+
+/*** camera control ***/
+function playStop() {
+  let enabled = myVideoStream.getVideoTracks()[0].enabled;
+  if (enabled) {
+    myVideoStream.getVideoTracks()[0].enabled = false;
+    const html = `
+   <i class="material-icons">&#xe04c;</i>
+   <p class="label">Cam</p>
+ `;
+    document.getElementById("videoControl").innerHTML = html;
+  } else {
+    myVideoStream.getVideoTracks()[0].enabled = true;
+    const html = `
+   <i class="material-icons">&#xe04b;</i>
+   <p class="label">Cam</p>
+   `;
+    document.getElementById("videoControl").innerHTML = html;
   }
 }
