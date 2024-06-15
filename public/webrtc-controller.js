@@ -3,6 +3,13 @@ let shareState = 0;
 let videoTrack;
 let streamBack;
 let sharedStream;
+/*** record meeting variables ***/
+let recordState = 1;
+let stream = null;
+let audio = null;
+let mixedStream = null;
+let chunks = [];
+let recorder = null;
 
 /****** 1) Get User Media ******/
 const videoGrid = document.getElementById("video-grid");
@@ -121,7 +128,7 @@ peer.on("call", (call) => {
       audio: true,
     })
     .then((stream) => {
-      //myVideoStream = stream;
+      // myVideoStream = stream;
       // for debug: console.log("after getting stream");
       call.answer(myVideoStream);
       var conn = peer.connect(call.peer);
@@ -260,4 +267,69 @@ socket.on("no-share", (peerId) => {
 
 function getSharedVideo() {
   changeMainVideo(streamBack);
+}
+
+/*** Record functionality ***/
+function recordMeeting() {
+  if (recordState == 1) {
+    startRecording();
+  } else {
+    stopRecording();
+  }
+}
+
+async function startRecording() {
+  try {
+    stream = await navigator.mediaDevices.getDisplayMedia({
+      video: true,
+      audio: true,
+    });
+    audio = await navigator.mediaDevices.getUserMedia({
+      audio: {
+        echoCancellation: true,
+        noiseSuppression: true,
+        sampleRate: 44100,
+      },
+    });
+    recordState = 0;
+    document.getElementById("recordControl").style.color = "#fd6f13";
+  } catch (err) {
+    console.error(err);
+  }
+  if (stream && audio) {
+    mixedStream = new MediaStream([
+      ...stream.getTracks(),
+      ...audio.getTracks(),
+    ]);
+    recorder = new MediaRecorder(mixedStream);
+    recorder.ondataavailable = handleDataAvailable;
+    recorder.onstop = handleStop;
+    recorder.start(1000);
+  }
+}
+
+// This function is called whenever the recorder has data available
+function handleDataAvailable(e) {
+  chunks.push(e.data);
+}
+
+// This function is called when the recording stops
+function handleStop(e) {
+  const blob = new Blob(chunks, { type: "video/mp4" });
+  chunks = [];
+  stream.getTracks().forEach((track) => track.stop());
+  audio.getTracks().forEach((track) => track.stop());
+  const element = document.createElement("a");
+  element.href = URL.createObjectURL(blob);
+  element.download = "video.mp4";
+  element.style.display = "none";
+  document.body.appendChild(element);
+  element.click();
+  document.body.removeChild(element);
+}
+
+function stopRecording() {
+  recordState = 1;
+  document.getElementById("recordControl").style.color = "#000000";
+  recorder.stop();
 }
