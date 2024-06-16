@@ -56,6 +56,15 @@ app.get("/:room", (req, res) => {
   });
 });
 
+/***  when file upload route ***/
+app.post("/upload", (req, res) => {
+  const fileName = req.headers["file-name"];
+  req.on("data", (chunk) => {
+    fs.appendFileSync(__dirname + "/public/uploaded-files/" + fileName, chunk);
+  });
+  res.end("uploaded");
+});
+
 //*** 4) Initialize connection for meeting ***/
 
 /*** Importing and Setting Up the Express Peer Server ***/

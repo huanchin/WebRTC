@@ -401,3 +401,45 @@ function scrollToBottom() {
   let chatroom = document.getElementById("chatroom");
   chatroom.scrollTop = chatroom.scrollHeight;
 }
+
+/*** File sharing ***/
+function selectFile(val) {
+  var filename = val.replace(/C:\\fakepath\\/i, "");
+  document.getElementById("textchat").value = filename;
+  uploadState = 1;
+}
+
+function uploadFile() {
+  alert("uploading file...");
+  uploadState = 0;
+  const file = document.getElementById("file");
+  const fileReader = new FileReader();
+  const theFile = file.files[0];
+  fileReader.onload = async (ev) => {
+    // ev.target.result 是一個包含文件數據的 ArrayBuffer 對象，
+    // 這是通過 FileReader 的 readAsArrayBuffer 方法讀取的文件。
+    // byteLength 是這個 ArrayBuffer 的屬性，表示文件的字節長度，即文件的大小（以字節為單位）
+    // 1024 字節等於 1 KB，1024 KB 等於 1 MB，因此 1024 * 1024 字節等於 1 MB
+    const chunkCount =
+      Math.floor(ev.target.result.byteLength / (1024 * 1024)) + 1;
+    const CHUNK_SIZE = ev.target.result.byteLength / chunkCount;
+    const fileName = theFile.name;
+    for (let chunkId = 0; chunkId < chunkCount + 1; chunkId++) {
+      const chunk = ev.target.result.slice(
+        chunkId * CHUNK_SIZE,
+        chunkId * CHUNK_SIZE + CHUNK_SIZE
+      );
+      await fetch("/upload", {
+        method: "POST",
+        headers: {
+          "content-type": "application/octet-stream",
+          "file-name": fileName,
+          "content-length": chunk.length,
+        },
+        body: chunk,
+      });
+    }
+  };
+  fileReader.readAsArrayBuffer(theFile);
+  file.value = "";
+}
