@@ -333,3 +333,71 @@ function stopRecording() {
   document.getElementById("recordControl").style.color = "#000000";
   recorder.stop();
 }
+
+/*** Text chat ***/
+let text = document.getElementById("textchat");
+
+// send the message when press enter
+text.addEventListener("keydown", (e) => {
+  let hour = new Date().getHours();
+  hour = ("0" + hour).slice(-2);
+  let minute = new Date().getMinutes();
+  minute = ("0" + minute).slice(-2);
+  const time = hour + "." + minute;
+  if (e.which == 13 && text.value.length !== 0) {
+    socket.emit("message", text.value, USERNAME, RANDOM_COLOR, time);
+    text.value = "";
+  }
+});
+
+// send the msg/ file when click on send btn
+let uploadState = 0;
+document.getElementById("sendMessage").addEventListener("click", () => {
+  let hour = new Date().getHours();
+  hour = ("0" + hour).slice(-2);
+  let minute = new Date().getMinutes();
+  minute = ("0" + minute).slice(-2);
+  const time = hour + "." + minute;
+  if (uploadState === 0) {
+    socket.emit("message", text.value, USERNAME, RANDOM_COLOR, time);
+    text.value = "";
+  } else {
+    uploadFile();
+    const html =
+      '<a href="uploaded-files/' +
+      text.value +
+      '" target="_blank">' +
+      text.value +
+      "</a>";
+    socket.emit("message", html, USERNAME, RANDOM_COLOR, time);
+    text.value = "";
+  }
+});
+
+// listen to incoming message
+socket.on("createMessage", (message, sender, color, time) => {
+  const initial = sender.substring(0, 1);
+  const chatroom = document.getElementById("chatroom");
+  const newMessage = document.createElement("div");
+
+  newMessage.innerHTML = `
+    <div id="left-chatroom" style="background-color: ${color}">
+      <p class="profil">${initial}</p>
+      <div class="mini-active"></div>
+    </div>
+    <div id="right-chatroom">
+      <div id="message">
+        <p id="message-user" style="color: #303030; font-weight: bold;">${sender}</p>
+        <p id="message-text">${message}</p>
+      </div>
+    </div>
+    <p id="time-text" style="font-size:11px; color:#303030; margin-left: 55px; margin-top: 0px; padding-top: 0px; margin-bottom: 12px; color: white;">${time}</p>
+  `;
+  chatroom.appendChild(newMessage);
+  scrollToBottom();
+});
+
+function scrollToBottom() {
+  let chatroom = document.getElementById("chatroom");
+  chatroom.scrollTop = chatroom.scrollHeight;
+}

@@ -81,5 +81,9 @@ io.on("connection", (socket) => {
     socket.on("stop-screen-share", (peerId) => {
       io.to(roomId).emit("no-share", peerId);
     });
+
+    socket.on("message", (message, sender, color, time) => {
+      io.to(roomId).emit("createMessage", message, sender, color, time);
+    });
   });
 });
