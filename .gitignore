@@ -1,13 +1,3 @@
-# Ignore all images
-*.jpg
-*.jpeg
-*.png
-*.gif
-*.bmp
-*.tiff
-*.svg
-*.ico
-
 # Other patterns you might want to ignore
 node_modules/
 public/uploaded-files/
