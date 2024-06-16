@@ -117,6 +117,11 @@
     <!--End of container-->
 
     <script>
+      /*** prevent user from seeing our source code ***/
+      document.addEventListener("contextmenu", (event) =>
+        event.preventDefault()
+      );
+
       function flipToBack() {
         document.getElementById("form").style.transform = "rotateY(180deg)";
       }

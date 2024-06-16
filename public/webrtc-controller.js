@@ -443,3 +443,19 @@ function uploadFile() {
   fileReader.readAsArrayBuffer(theFile);
   file.value = "";
 }
+
+/*** Leave meeting ***/
+function leaveMeeting() {
+  let text = "Are you sure?";
+  if (confirm(text) == true) {
+    socket.emit("leave-meeting", myPeerId, USERNAME);
+    peer.disconnect();
+    location.assign("/");
+  }
+}
+socket.on("user-leave", (peerId, peerName) => {
+  alert(peerName + " left the meeting");
+  var node = document.getElementById(peerId).parentNode;
+  videoGrid.removeChild(node);
+  countUser();
+});

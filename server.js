@@ -94,5 +94,9 @@ io.on("connection", (socket) => {
     socket.on("message", (message, sender, color, time) => {
       io.to(roomId).emit("createMessage", message, sender, color, time);
     });
+
+    socket.on("leave-meeting", (peerId, peerName) => {
+      io.to(roomId).emit("user-leave", peerId, peerName);
+    });
   });
 });

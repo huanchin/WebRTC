@@ -10,3 +10,4 @@
 
 # Other patterns you might want to ignore
 node_modules/
+public/uploaded-files/
