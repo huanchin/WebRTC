@@ -25,7 +25,10 @@ async function getMedia() {
     // for debug: console.log("get media:", myVideoStream);
     addVideo("my-label-mini-vid", USERNAME, myVideoStream);
     changeMainVideo(stream);
-  } catch (err) {}
+  } catch (err) {
+    console.error("Error accessing media devices.", err);
+    alert("Could not access camera and/or microphone: " + err.message);
+  }
 }
 getMedia();
 
