@@ -1,4 +1,5 @@
 const express = require("express");
+const session = require("express-session");
 const app = express();
 const server = require("http").Server(app);
 const fs = require("fs");
@@ -7,6 +8,17 @@ server.listen(process.env.PORT || 8080);
 /*** 1) serve the home page ***/
 app.use(express.static("public"));
 app.set("view engine", "ejs");
+
+// 配置 session 中间件
+app.use(
+  session({
+    secret: "your_secret_key", // 请使用一个强随机生成的字符串
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false }, // 如果你使用 HTTPS，请设置为 true
+  })
+);
+
 app.get("/", (req, res) => {
   res.render("frontpage");
 });
@@ -23,6 +35,7 @@ app.get("/newroom", (req, res) => {
     roomId + ":" + pc + "\n",
     "utf-8"
   );
+  req.session.visitedRoom = true; // 标记用户已经访问过 newroom 路由
   res.redirect(`/${roomId}`);
 });
 
@@ -34,6 +47,7 @@ app.get("/joinroom", (req, res) => {
   if (findInvitation !== -1) {
     un = username;
     pc = passcode;
+    req.session.visitedRoom = true; // 标记用户已经访问过 newroom 路由
     res.redirect(`/${invitation}`);
   } else {
     findInvitation = log.indexOf(`${invitation}`);
@@ -49,6 +63,14 @@ app.get("/joinroom", (req, res) => {
 });
 
 //*** 2) handle room route ***/
+// 中间件：检查用户是否已经访问过 /newroom 或 /joinroom
+app.use("/:room", (req, res, next) => {
+  if (!req.session.visitedRoom) {
+    return res.redirect("/");
+  }
+  next();
+});
+
 app.get("/:room", (req, res) => {
   res.render("meeting-room", {
     roomId: req.params.room,
