@@ -72,6 +72,24 @@ function changeMainVideo(stream) {
 /****** 2-a) Initializing Socket.IO Client ******/
 // socket is used to receive message from signaling server
 const socket = io("/");
+
+/*** on EC2 ***
+const socket = io("https://webrtc.huanchin.com",{
+  withCredentials: true,
+});
+*** on EC2 ***/
+
+socket.on("connect_error", (err) => {
+  // the reason of the error, for example "xhr poll error"
+  console.log(err.message);
+
+  // some additional description, for example the status code of the initial HTTP response
+  console.log(err.description);
+
+  // some additional context, for example the XMLHttpRequest object
+  console.log(err.context);
+});
+
 let myPeerId;
 let peerList = [];
 /****** 2-b) Creating a PeerJS Object *******/
@@ -81,6 +99,15 @@ const peer = new Peer(undefined, {
   host: "/",
   port: "8080",
 });
+
+/*** 
+const peer = new Peer(undefined, {
+  path: "/peerjs",
+  host: "/",
+  port: "443",
+});
+ ***/
+
 /***** 2-c) After connection successfully established ***/
 // A) emit "join-room" message to server, send along with roomId and peerId
 peer.on("open", (id) => {

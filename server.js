@@ -103,6 +103,17 @@ app.use("/peerjs", peerServer);
 /**** Setting Up Socket.IO ****/
 const io = require("socket.io")(server);
 
+io.engine.on("connection_error", (err) => {
+  // the reason of the error, for example "xhr poll error"
+  console.log(err.req);
+  console.log(err.code);
+  // some additional description, for example the status code of the initial HTTP response
+  console.log(err.message);
+
+  // some additional context, for example the XMLHttpRequest object
+  console.log(err.context);
+});
+
 // triggered when there is user connected to server
 io.on("connection", (socket) => {
   socket.on("join-room", (roomId, peerId) => {
