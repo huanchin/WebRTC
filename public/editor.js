@@ -1,6 +1,5 @@
 import * as Y from "yjs";
 import { CodemirrorBinding } from "y-codemirror";
-import { WebrtcProvider } from "y-webrtc";
 import CodeMirror from "codemirror";
 import "codemirror/mode/javascript/javascript";
 import "codemirror/lib/codemirror.css";
@@ -9,25 +8,24 @@ import "codemirror/lib/codemirror.css";
 const ydoc = new Y.Doc();
 console.log("ydoc: ", ydoc);
 
-// Custom WebRTC provider options
-const signalingServers = ["ws://localhost:8080"]; // Change to your signaling server
-
-// Connect to the WebRTC provider
-const provider = new WebrtcProvider(ROOM_ID, ydoc, {
-  signaling: signalingServers,
-});
 console.log("RoomID: ", ROOM_ID);
-console.log("provider: ", provider);
 
 // Create a shared Yjs text type
 const yText = ydoc.getText("codemirror");
 console.log("yText: ", yText);
 
 // Bind Yjs text type to CodeMirror
-const binding = new CodemirrorBinding(yText, editor, provider.awareness);
+const binding = new CodemirrorBinding(yText, window.editor);
 console.log("binding: ", binding);
 
-// Optional: Set user information for awareness
-provider.awareness.setLocalStateField("user", {
-  name: "Anonymous",
+socket.on("syncDoc", (update) => {
+  Y.applyUpdate(ydoc, new Uint8Array(update));
+});
+
+ydoc.on("update", (update) => {
+  socket.emit("docUpdate", Array.from(update));
+});
+
+socket.on("docUpdate", (update) => {
+  Y.applyUpdate(ydoc, new Uint8Array(update));
 });

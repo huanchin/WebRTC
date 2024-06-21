@@ -1,6 +1,7 @@
 const express = require("express");
 const session = require("express-session");
 const { exec } = require("child_process");
+const Y = require("yjs");
 const app = express();
 const server = require("http").Server(app);
 const fs = require("fs");
@@ -29,6 +30,7 @@ app.get("/", (req, res) => {
 //*** 2) handle newroom route ***/
 const { v4: uuidv4 } = require("uuid");
 let un, pc;
+const map = {};
 app.get("/newroom", (req, res) => {
   un = req.query.username;
   pc = req.query.passcode;
@@ -38,6 +40,7 @@ app.get("/newroom", (req, res) => {
     roomId + ":" + pc + "\n",
     "utf-8"
   );
+  map[roomId] = req.query.username;
   req.session.visitedRoom = true; // 标记用户已经访问过 newroom 路由
   res.redirect(`/${roomId}`);
 });
@@ -78,6 +81,7 @@ app.get("/:room", (req, res) => {
   res.render("meeting-room", {
     roomId: req.params.room,
     username: un,
+    isHost: map[req.params.room] === un,
   });
 });
 
@@ -117,11 +121,33 @@ io.engine.on("connection_error", (err) => {
   console.log(err.context);
 });
 
+// Map to store Yjs documents
+const docs = new Map();
+
 // triggered when there is user connected to server
 io.on("connection", (socket) => {
   socket.on("join-room", (roomId, peerId) => {
     socket.join(roomId);
+
+    if (!docs.has(roomId)) {
+      const doc = new Y.Doc();
+      docs.set(roomId, doc);
+    }
+
+    const doc = docs.get(roomId);
+
     socket.to(roomId).emit("user-connected", peerId);
+
+    // Sync the initial state of the document
+    socket.to(roomId).emit("syncDoc", Y.encodeStateAsUpdate(doc));
+
+    doc.on("update", (update) => {
+      socket.to(roomId).emit("docUpdate", update);
+    });
+
+    socket.on("docUpdate", (update) => {
+      Y.applyUpdate(doc, new Uint8Array(update));
+    });
 
     socket.on("stop-screen-share", (peerId) => {
       io.to(roomId).emit("no-share", peerId);
