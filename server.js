@@ -10,6 +10,8 @@ server.listen(process.env.PORT || 8080);
 app.use(express.static("public"));
 app.set("view engine", "ejs");
 
+app.set("trust proxy", true);
+
 // 配置 session 中间件
 app.use(
   session({
