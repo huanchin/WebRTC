@@ -489,3 +489,44 @@ socket.on("user-leave", (peerId, peerName) => {
   videoGrid.removeChild(node);
   countUser();
 });
+
+const editorElement = document.getElementById("editor");
+const outputElement = document.getElementById("output");
+const languageSelect = document.getElementById("language-select");
+const runButton = document.getElementById("run-button");
+
+console.log(runButton);
+
+// Initialize CodeMirror
+window.editor = CodeMirror(editorElement, {
+  mode: "javascript",
+  lineNumbers: true,
+  theme: "default",
+});
+
+// Change language mode based on selection
+languageSelect.addEventListener("change", () => {
+  outputElement.innerHTML = "";
+  const language = languageSelect.value;
+  let mode = "javascript";
+  if (language === "python") {
+    mode = "python";
+  } else if (language === "cpp") {
+    mode = "text/x-c++src";
+  }
+  window.editor.setOption("mode", mode);
+});
+
+// Event listener for the run button
+runButton.addEventListener("click", () => {
+  console.log("run");
+  const code = window.editor.getValue();
+  const language = languageSelect.value;
+  socket.emit("runCode", code, language);
+});
+
+// Receiving output from the server
+socket.on("output", (output) => {
+  console.log("output");
+  outputElement.innerHTML = output.replace(/\n/g, "<br>");
+});

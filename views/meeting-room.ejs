@@ -5,11 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>WebRTC Video Conference</title>
     <link rel="icon" type="image/x-icon" href="image-assets/logo-favicon.png" />
-    <link rel="stylesheet" href="css/style-room.css" />
     <link
       href="https://fonts.googleapis.com/icon?family=Material+Icons"
       rel="stylesheet"
     />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.61.0/codemirror.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.61.0/theme/default.min.css"
+    />
+    <link rel="stylesheet" href="css/style-room.css" />
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://unpkg.com/peerjs@1.3.1/dist/peerjs.min.js"></script>
     <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script> -->
@@ -183,13 +191,30 @@
             <!--End of chatform-->
           </div>
           <!--End of right-content-->
+          <div id="myright-content">
+            <select id="language-select">
+              <option value="javascript">JavaScript</option>
+              <option value="python">Python</option>
+              <option value="cpp">C++</option>
+            </select>
+            <button id="run-button">Run</button>
+            <div id="code-container">
+              <div id="editor"></div>
+              <div id="output"></div>
+            </div>
+          </div>
         </div>
         <!--End of content-->
       </div>
       <!--End of form-->
     </div>
     <!--End of container-->
-
+    <!-- CodeMirror JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.61.0/codemirror.min.js"></script>
+    <!-- CodeMirror Modes -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.61.0/mode/javascript/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.61.0/mode/python/python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.61.0/mode/clike/clike.min.js"></script>
     <script>
       /*** prevent user from seeing our source code ***/
       document.addEventListener("contextmenu", (event) =>

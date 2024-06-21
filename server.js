@@ -1,5 +1,6 @@
 const express = require("express");
 const session = require("express-session");
+const { exec } = require("child_process");
 const app = express();
 const server = require("http").Server(app);
 const fs = require("fs");
@@ -126,6 +127,41 @@ io.on("connection", (socket) => {
 
     socket.on("message", (message, sender, color, time) => {
       io.to(roomId).emit("createMessage", message, sender, color, time);
+    });
+
+    socket.on("runCode", (code, language) => {
+      let command;
+      switch (language) {
+        case "python":
+          command = `docker run --rm python python -c "${code.replace(
+            /"/g,
+            '\\"'
+          )}"`;
+          break;
+        case "javascript":
+          command = `docker run --rm node sh -c "node -e '${code.replace(
+            /"/g,
+            '\\"'
+          )}'"`;
+          break;
+        case "cpp":
+          const fs = require("fs");
+          const filePath = "temp.cpp";
+          fs.writeFileSync(filePath, code);
+          command = `g++ ${filePath} -o temp && ./temp`;
+          break;
+        default:
+          socket.emit("output", "Unsupported language");
+          return;
+      }
+
+      exec(command, (error, stdout, stderr) => {
+        if (error) {
+          socket.emit("output", stderr);
+          return;
+        }
+        socket.emit("output", stdout);
+      });
     });
 
     socket.on("leave-meeting", (peerId, peerName) => {
