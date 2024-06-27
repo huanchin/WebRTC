@@ -94,19 +94,17 @@ let myPeerId;
 let peerList = [];
 /****** 2-b) Creating a PeerJS Object *******/
 // peer is used to communicate with other peers
-const peer = new Peer(undefined, {
-  path: "/peerjs",
-  host: "/",
-  port: "8080",
-});
+// const peer = new Peer(undefined, {
+//   path: "/peerjs",
+//   host: "/",
+//   port: "8080",
+// });
 
-/*** 
 const peer = new Peer(undefined, {
   path: "/peerjs",
   host: "/",
   port: "443",
 });
- ***/
 
 /***** 2-c) After connection successfully established ***/
 // A) emit "join-room" message to server, send along with roomId and peerId
