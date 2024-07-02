@@ -179,9 +179,9 @@ html {
 }
 
 #myright-content {
-  width: 358px;
+  width: 350px;
   height: 565px;
-  margin: 20px 20px 20px 0px;
+  margin-top: 20px;
   float: left;
   background-color: #d8e5f2;
   border-radius: 15px;
