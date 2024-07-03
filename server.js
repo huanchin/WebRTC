@@ -1,11 +1,14 @@
 const express = require("express");
 const session = require("express-session");
 const { exec } = require("child_process");
+const Redis = require("ioredis");
 const Y = require("yjs");
 const app = express();
 const server = require("http").Server(app);
 const fs = require("fs");
 server.listen(process.env.PORT || 8080);
+
+const redis = new Redis();
 
 /*** 1) serve the home page ***/
 app.use(express.static("public"));
@@ -27,6 +30,19 @@ app.get("/", (req, res) => {
   res.render("frontpage");
 });
 
+//*** 4) Initialize connection for meeting ***/
+
+/*** Importing and Setting Up the Express Peer Server ***/
+const { ExpressPeerServer } = require("peer");
+/*** creates a PeerJS server instance using ExpressPeerServer ***/
+const peerServer = ExpressPeerServer(server, {
+  debug: true,
+});
+/*** Integrating the PeerJS Server with an Express Application ***/
+// This line tells the Express application to use the PeerJS server at the /peerjs path
+// any requests to /peerjs on your server will be handled by the PeerJS server
+app.use("/peerjs", peerServer);
+
 //*** 2) handle newroom route ***/
 const { v4: uuidv4 } = require("uuid");
 let un, pc;
@@ -35,17 +51,20 @@ app.get("/newroom", (req, res) => {
   un = req.query.username;
   pc = req.query.passcode;
   const roomId = uuidv4();
-  fs.appendFileSync(
-    "public/meeting-log.txt",
-    roomId + ":" + pc + "\n",
-    "utf-8"
-  );
+  redis.set(roomId, pc);
+  // fs.appendFileSync(
+  //   "public/meeting-log.txt",
+  //   roomId + ":" + pc + "\n",
+  //   "utf-8"
+  // );
   map[roomId] = req.query.username;
-  req.session.visitedRoom = true; // 标记用户已经访问过 newroom 路由
+  req.session.room = roomId;
+  console.log(req.session.room);
   res.redirect(`/${roomId}`);
 });
 
 //*** 3) handle join room route ***/
+/*
 app.get("/joinroom", (req, res) => {
   const { username, invitation, passcode } = req.query;
   const log = fs.readFileSync("public/meeting-log.txt", "utf-8");
@@ -67,12 +86,36 @@ app.get("/joinroom", (req, res) => {
     }
   }
 });
+*/
+app.get("/joinroom", (req, res) => {
+  const { username, invitation, passcode } = req.query;
+  redis.get(invitation, (err, result) => {
+    if (err) {
+      console.log("Redis get roomID error:", err);
+      res.redirect("/");
+      return;
+    }
+    console.log(invitation);
+    console.log(result);
+    if (!result) {
+      res.send("Invalid invitation. Please <a href=/>go back</a>");
+    } else if (result !== passcode) {
+      res.send("Invalid password. Please <a href=/>go back</a>");
+    } else {
+      un = username;
+      pc = passcode;
+      req.session.room = invitation;
+      res.redirect(`/${invitation}`);
+    }
+  });
+});
 
 //*** 2) handle room route ***/
 // 中间件：检查用户是否已经访问过 /newroom 或 /joinroom
 app.use("/:room", (req, res, next) => {
-  if (!req.session.visitedRoom) {
-    return res.redirect("/");
+  const roomID = req.params.room;
+  if (req.session.room !== roomID) {
+    return res.redirect(`/?room=${roomID}`);
   }
   next();
 });
@@ -93,19 +136,6 @@ app.post("/upload", (req, res) => {
   });
   res.end("uploaded");
 });
-
-//*** 4) Initialize connection for meeting ***/
-
-/*** Importing and Setting Up the Express Peer Server ***/
-const { ExpressPeerServer } = require("peer");
-/*** creates a PeerJS server instance using ExpressPeerServer ***/
-const peerServer = ExpressPeerServer(server, {
-  debug: true,
-});
-/*** Integrating the PeerJS Server with an Express Application ***/
-// This line tells the Express application to use the PeerJS server at the /peerjs path
-// any requests to /peerjs on your server will be handled by the PeerJS server
-app.use("/peerjs", peerServer);
 
 /**** Setting Up Socket.IO ****/
 const io = require("socket.io")(server);

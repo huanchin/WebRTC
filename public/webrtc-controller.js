@@ -103,7 +103,7 @@ let peerList = [];
 const peer = new Peer(undefined, {
   path: "/peerjs",
   host: "/",
-  port: "443",
+  port: "8080",
 });
 
 /***** 2-c) After connection successfully established ***/
@@ -527,4 +527,12 @@ runButton.addEventListener("click", () => {
 socket.on("output", (output) => {
   console.log("output");
   outputElement.innerHTML = output.replace(/\n/g, "<br>");
+});
+
+window.addEventListener("beforeunload", function (event) {
+  // Your custom logic here
+  console.log("User is reloading the browser");
+  socket.emit("leave-meeting", myPeerId, USERNAME);
+  peer.disconnect();
+  location.assign("/");
 });

@@ -121,6 +121,21 @@
       document.addEventListener("contextmenu", (event) =>
         event.preventDefault()
       );
+      /*** get query param ***/
+      // Get the query string from the URL
+      const queryString = window.location.search;
+
+      // Create a new URLSearchParams object
+      const urlParams = new URLSearchParams(queryString);
+
+      // Get a specific query parameter
+      const paramValue = urlParams.get("room");
+
+      // flipToBack and auto fill roomId
+      if (paramValue) {
+        flipToBack();
+        document.getElementById("joininv").value = paramValue;
+      }
 
       function flipToBack() {
         document.getElementById("form").style.transform = "rotateY(180deg)";
