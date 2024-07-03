@@ -11,29 +11,39 @@ html {
   font-family: "Trebuchet MS", sans-serif;
 }
 
+body {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .container {
   /* width: 1050px; */
   width: 100vw;
   height: 610px;
-  border-radius: 25px;
+  /* border-radius: 25px; */
   background: linear-gradient(
     to right bottom,
     rgba(255, 255, 255, 0.6),
     rgba(255, 255, 255, 0.2)
   );
   backdrop-filter: blur(10px);
-  position: absolute;
+  /* position: absolute;
   margin: auto;
   top: 0;
   bottom: 0;
   left: 0;
   right: 0;
-  border: 1px solid #ffffff;
+  border: 1px solid #ffffff; */
+  display: flex;
+  justify-content: space-around;
+  padding: 0px 20px;
 }
 .left-content {
   width: 690px;
   height: 610px;
-  margin: 20px 20px 0px 20px;
+  margin-top: 20px;
   float: left;
 }
 
@@ -170,7 +180,7 @@ html {
 #right-content {
   width: 296px;
   height: 565px;
-  margin: 20px 20px 20px 0px;
+  margin: 20px 0px;
   float: left;
   background-color: #d8e5f2;
   border-radius: 15px;
