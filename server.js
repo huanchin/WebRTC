@@ -2,6 +2,8 @@ const express = require("express");
 const session = require("express-session");
 const { exec } = require("child_process");
 const Redis = require("ioredis");
+const { MongoClient } = require("mongodb");
+const { createAdapter } = require("@socket.io/mongo-adapter");
 const Y = require("yjs");
 const app = express();
 const server = require("http").Server(app);
@@ -142,90 +144,105 @@ app.post("/upload", (req, res) => {
 /**** Setting Up Socket.IO ****/
 const io = require("socket.io")(server);
 
-io.engine.on("connection_error", (err) => {
-  // the reason of the error, for example "xhr poll error"
-  console.log(err.req);
-  console.log(err.code);
-  // some additional description, for example the status code of the initial HTTP response
-  console.log(err.message);
+const uri =
+  "mongodb+srv://cherry032826:ch032826@webrtc.v30lk2d.mongodb.net/?retryWrites=true&w=majority&appName=webrtc";
+const client = new MongoClient(uri);
 
-  // some additional context, for example the XMLHttpRequest object
-  console.log(err.context);
-});
+client
+  .connect()
+  .then(() => {
+    const db = client.db("webrtc");
+    const collection = db.collection("socket.io-adapter-events");
 
-// Map to store Yjs documents
-const docs = new Map();
+    // 使用 MongoDB 适配器
+    io.adapter(createAdapter(collection));
 
-// triggered when there is user connected to server
-io.on("connection", (socket) => {
-  socket.on("join-room", (roomId, peerId) => {
-    socket.join(roomId);
+    io.engine.on("connection_error", (err) => {
+      // the reason of the error, for example "xhr poll error"
+      console.log(err.req);
+      console.log(err.code);
+      // some additional description, for example the status code of the initial HTTP response
+      console.log(err.message);
 
-    if (!docs.has(roomId)) {
-      const doc = new Y.Doc();
-      docs.set(roomId, doc);
-    }
-
-    const doc = docs.get(roomId);
-
-    socket.to(roomId).emit("user-connected", peerId);
-
-    // Sync the initial state of the document
-    socket.to(roomId).emit("syncDoc", Y.encodeStateAsUpdate(doc));
-
-    doc.on("update", (update) => {
-      socket.to(roomId).emit("docUpdate", update);
+      // some additional context, for example the XMLHttpRequest object
+      console.log(err.context);
     });
 
-    socket.on("docUpdate", (update) => {
-      Y.applyUpdate(doc, new Uint8Array(update));
-    });
+    // Map to store Yjs documents
+    const docs = new Map();
 
-    socket.on("stop-screen-share", (peerId) => {
-      io.to(roomId).emit("no-share", peerId);
-    });
+    // triggered when there is user connected to server
+    io.on("connection", (socket) => {
+      socket.on("join-room", (roomId, peerId) => {
+        socket.join(roomId);
 
-    socket.on("message", (message, sender, color, time) => {
-      io.to(roomId).emit("createMessage", message, sender, color, time);
-    });
-
-    socket.on("runCode", (code, language) => {
-      let command;
-      switch (language) {
-        case "python":
-          command = `docker run --rm python python -c "${code.replace(
-            /"/g,
-            '\\"'
-          )}"`;
-          break;
-        case "javascript":
-          command = `docker run --rm node sh -c "node -e '${code.replace(
-            /"/g,
-            '\\"'
-          )}'"`;
-          break;
-        case "cpp":
-          const fs = require("fs");
-          const filePath = "temp.cpp";
-          fs.writeFileSync(filePath, code);
-          command = `g++ ${filePath} -o temp && ./temp`;
-          break;
-        default:
-          socket.emit("output", "Unsupported language");
-          return;
-      }
-
-      exec(command, (error, stdout, stderr) => {
-        if (error) {
-          socket.emit("output", stderr);
-          return;
+        if (!docs.has(roomId)) {
+          const doc = new Y.Doc();
+          docs.set(roomId, doc);
         }
-        socket.emit("output", stdout);
+
+        const doc = docs.get(roomId);
+
+        socket.to(roomId).emit("user-connected", peerId);
+
+        // Sync the initial state of the document
+        socket.to(roomId).emit("syncDoc", Y.encodeStateAsUpdate(doc));
+
+        doc.on("update", (update) => {
+          socket.to(roomId).emit("docUpdate", update);
+        });
+
+        socket.on("docUpdate", (update) => {
+          Y.applyUpdate(doc, new Uint8Array(update));
+        });
+
+        socket.on("stop-screen-share", (peerId) => {
+          io.to(roomId).emit("no-share", peerId);
+        });
+
+        socket.on("message", (message, sender, color, time) => {
+          io.to(roomId).emit("createMessage", message, sender, color, time);
+        });
+
+        socket.on("runCode", (code, language) => {
+          let command;
+          switch (language) {
+            case "python":
+              command = `docker run --rm python python -c "${code.replace(
+                /"/g,
+                '\\"'
+              )}"`;
+              break;
+            case "javascript":
+              command = `docker run --rm node sh -c "node -e '${code.replace(
+                /"/g,
+                '\\"'
+              )}'"`;
+              break;
+            case "cpp":
+              const fs = require("fs");
+              const filePath = "temp.cpp";
+              fs.writeFileSync(filePath, code);
+              command = `g++ ${filePath} -o temp && ./temp`;
+              break;
+            default:
+              socket.emit("output", "Unsupported language");
+              return;
+          }
+
+          exec(command, (error, stdout, stderr) => {
+            if (error) {
+              socket.emit("output", stderr);
+              return;
+            }
+            socket.emit("output", stdout);
+          });
+        });
+
+        socket.on("leave-meeting", (peerId, peerName) => {
+          io.to(roomId).emit("user-leave", peerId, peerName);
+        });
       });
     });
-
-    socket.on("leave-meeting", (peerId, peerName) => {
-      io.to(roomId).emit("user-leave", peerId, peerName);
-    });
-  });
-});
+  })
+  .catch(console.error);
