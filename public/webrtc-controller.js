@@ -530,7 +530,6 @@ socket.on("output", (output) => {
 });
 
 window.addEventListener("beforeunload", function (event) {
-  // Your custom logic here
   console.log("User is reloading the browser");
   socket.emit("leave-meeting", myPeerId, USERNAME);
   peer.disconnect();

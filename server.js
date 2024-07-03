@@ -59,6 +59,7 @@ app.get("/newroom", (req, res) => {
   // );
   map[roomId] = req.query.username;
   req.session.room = roomId;
+  req.session.username = un;
   console.log(req.session.room);
   res.redirect(`/${roomId}`);
 });
@@ -105,6 +106,7 @@ app.get("/joinroom", (req, res) => {
       un = username;
       pc = passcode;
       req.session.room = invitation;
+      req.session.username = username;
       res.redirect(`/${invitation}`);
     }
   });
@@ -123,7 +125,7 @@ app.use("/:room", (req, res, next) => {
 app.get("/:room", (req, res) => {
   res.render("meeting-room", {
     roomId: req.params.room,
-    username: un,
+    username: req.session.username,
     isHost: map[req.params.room] === un,
   });
 });
