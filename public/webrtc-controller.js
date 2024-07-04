@@ -97,14 +97,10 @@ let peerList = [];
 // const peer = new Peer(undefined, {
 //   path: "/peerjs",
 //   host: "/",
-//   port: "8080",
+//   port: "443",
 // });
 
-const peer = new Peer(undefined, {
-  path: "/peerjs",
-  host: "/",
-  port: "8080",
-});
+const peer = new Peer();
 
 /***** 2-c) After connection successfully established ***/
 // A) emit "join-room" message to server, send along with roomId and peerId
