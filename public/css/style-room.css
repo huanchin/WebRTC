@@ -240,7 +240,11 @@ body {
 }
 
 #output {
-  width: 100%;
+  padding: 5%;
+  overflow: auto; /* 或者可以使用 hidden */
+  white-space: pre-wrap; /* 允许自动换行，并保留空白字符 */
+  word-wrap: break-word; /* 确保长单词可以被拆分 */
+  width: 90%;
   height: 235px;
   background: #f0f0f0;
 }
