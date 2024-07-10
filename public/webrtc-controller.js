@@ -527,7 +527,10 @@ languageSelect.addEventListener("change", () => {
 
 // Event listener for the run button
 runButton.addEventListener("click", () => {
-  console.log("run");
+  console.log("run code");
+  runButton.textContent = "loading...";
+  runButton.style.backgroundColor = "#e89964";
+  runButton.disable = true;
   const code = window.editor.getValue();
   const language = languageSelect.value;
   socket.emit("runCode", code, language);
@@ -535,7 +538,10 @@ runButton.addEventListener("click", () => {
 
 // Receiving output from the server
 socket.on("output", (output) => {
-  console.log("output");
+  console.log("run code output");
+  runButton.textContent = "Run";
+  runButton.style.backgroundColor = "#fd6f13";
+  runButton.disable = false;
   outputElement.innerHTML = output.replace(/\n/g, "<br>");
 });
 
