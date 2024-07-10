@@ -542,6 +542,10 @@ socket.on("output", (output) => {
   runButton.textContent = "Run";
   runButton.style.backgroundColor = "#979d6e";
   runButton.disable = false;
+  if (output.includes("context canceled")) {
+    outputElement.innerHTML = "<p>Execution timed out</p>";
+    return;
+  }
   outputElement.innerHTML = output.replace(/\n/g, "<br>");
 });
 
