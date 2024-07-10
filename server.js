@@ -205,13 +205,13 @@ io.on("connection", (socket) => {
       let command;
       switch (language) {
         case "python":
-          command = `docker run --rm python python -c "${code.replace(
+          command = `docker run --rm python:3.12.4-alpine3.20 python -c "${code.replace(
             /"/g,
             '\\"'
           )}"`;
           break;
         case "javascript":
-          command = `docker run --rm node sh -c "node -e '${code.replace(
+          command = `docker run --rm node:20.15.1-alpine3.19 sh -c "node -e '${code.replace(
             /"/g,
             '\\"'
           )}'"`;
