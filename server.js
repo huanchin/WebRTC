@@ -116,6 +116,17 @@ app.get("/joinroom", (req, res) => {
 // 中间件：检查用户是否已经访问过 /newroom 或 /joinroom
 app.use("/:room", (req, res, next) => {
   const roomID = req.params.room;
+  console.log(roomID);
+  if (roomID === "upload") {
+    const fileName = req.headers["file-name"];
+    req.on("data", (chunk) => {
+      fs.appendFileSync(
+        __dirname + "/public/uploaded-files/" + fileName,
+        chunk
+      );
+    });
+    return res.end("uploaded");
+  }
   if (req.session.room !== roomID) {
     return res.redirect(`/?room=${roomID}`);
   }
@@ -131,13 +142,14 @@ app.get("/:room", (req, res) => {
 });
 
 /***  when file upload route ***/
-app.post("/upload", (req, res) => {
-  const fileName = req.headers["file-name"];
-  req.on("data", (chunk) => {
-    fs.appendFileSync(__dirname + "/public/uploaded-files/" + fileName, chunk);
-  });
-  res.end("uploaded");
-});
+// app.post("/upload", (req, res) => {
+//   console.log("__dirname");
+//   const fileName = req.headers["file-name"];
+//   req.on("data", (chunk) => {
+//     fs.appendFileSync(__dirname + "/public/uploaded-files/" + fileName, chunk);
+//   });
+//   res.end("uploaded");
+// });
 
 /**** Setting Up Socket.IO ****/
 const io = require("socket.io")(server);

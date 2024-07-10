@@ -391,12 +391,13 @@ document.getElementById("sendMessage").addEventListener("click", () => {
     text.value = "";
   } else {
     uploadFile();
-    const html =
-      '<a href="uploaded-files/' +
-      text.value +
-      '" target="_blank">' +
-      text.value +
-      "</a>";
+    // const html =
+    //   '<a href="uploaded-files/' +
+    //   text.value +
+    //   '" target="_blank">' +
+    //   text.value +
+    //   "</a>";
+    const html = `<a href="http://${window.location.host}/uploaded-files/${text.value}" target="_blank">${text.value}</a>`;
     socket.emit("message", html, USERNAME, RANDOM_COLOR, time);
     text.value = "";
   }
@@ -453,11 +454,18 @@ function uploadFile() {
     const CHUNK_SIZE = ev.target.result.byteLength / chunkCount;
     const fileName = theFile.name;
     for (let chunkId = 0; chunkId < chunkCount + 1; chunkId++) {
+      // console.log(chunkId);
+      // console.log(chunkCount);
+      // console.log(fileName);
+
       const chunk = ev.target.result.slice(
         chunkId * CHUNK_SIZE,
         chunkId * CHUNK_SIZE + CHUNK_SIZE
       );
-      await fetch("/upload", {
+
+      // console.log(chunk);
+
+      const res = await fetch("/upload", {
         method: "POST",
         headers: {
           "content-type": "application/octet-stream",
@@ -466,6 +474,8 @@ function uploadFile() {
         },
         body: chunk,
       });
+
+      console.log(res);
     }
   };
   fileReader.readAsArrayBuffer(theFile);
