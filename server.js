@@ -6,9 +6,11 @@ const Y = require("yjs");
 const app = express();
 const server = require("http").Server(app);
 const fs = require("fs");
-server.listen(process.env.PORT || 8080);
+server.listen(process.env.PORT || 8000);
 
-const redis = new Redis();
+const redis = new Redis({
+  host: "webrtc-redis-cache.9k4snd.ng.0001.apse2.cache.amazonaws.com",
+});
 
 /*** 1) serve the home page ***/
 app.use(express.static("public"));
@@ -203,15 +205,19 @@ io.on("connection", (socket) => {
 
     socket.on("runCode", (code, language) => {
       let command;
+      let timeoutCommand;
+      const timeoutDuration = 5; // Set the timeout duration in seconds
       switch (language) {
         case "python":
-          command = `docker run --rm python:3.12.4-alpine3.20 python -c "${code.replace(
+          timeoutCommand = `timeout ${timeoutDuration}`;
+          command = `${timeoutCommand} docker run --rm python:3.12.4-alpine3.20 python -c "${code.replace(
             /"/g,
             '\\"'
           )}"`;
           break;
         case "javascript":
-          command = `docker run --rm node:20.15.1-alpine3.19 sh -c "node -e '${code.replace(
+          timeoutCommand = `timeout ${timeoutDuration}`;
+          command = `${timeoutCommand} docker run --rm node:20.15.1-alpine3.19 sh -c "node -e '${code.replace(
             /"/g,
             '\\"'
           )}'"`;
@@ -229,7 +235,11 @@ io.on("connection", (socket) => {
 
       exec(command, (error, stdout, stderr) => {
         if (error) {
-          socket.emit("output", stderr);
+          if (error.signal === "SIGTERM") {
+            socket.emit("output", "Execution timed out");
+          } else {
+            socket.emit("output", stderr);
+          }
           return;
         }
         socket.emit("output", stdout);

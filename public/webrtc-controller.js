@@ -103,7 +103,7 @@ let peerList = [];
 const peer = new Peer(undefined, {
   path: "/peerjs",
   host: "/",
-  port: "8080",
+  port: "443",
 });
 
 /***** 2-c) After connection successfully established ***/
@@ -397,7 +397,7 @@ document.getElementById("sendMessage").addEventListener("click", () => {
     //   '" target="_blank">' +
     //   text.value +
     //   "</a>";
-    const html = `<a href="http://${window.location.host}/uploaded-files/${text.value}" target="_blank">${text.value}</a>`;
+    const html = `<a href="https://${window.location.host}/uploaded-files/${text.value}" target="_blank">${text.value}</a>`;
     socket.emit("message", html, USERNAME, RANDOM_COLOR, time);
     text.value = "";
   }
@@ -493,7 +493,7 @@ function leaveMeeting() {
 }
 socket.on("user-leave", (peerId, peerName) => {
   alert(peerName + " left the meeting");
-  var node = document.getElementById(peerId).parentNode;
+  const node = document.getElementById(peerId).parentNode;
   videoGrid.removeChild(node);
   countUser();
 });
@@ -538,7 +538,7 @@ runButton.addEventListener("click", () => {
 
 // Receiving output from the server
 socket.on("output", (output) => {
-  console.log("run code output");
+  console.log(output);
   runButton.textContent = "Run";
   runButton.style.backgroundColor = "#979d6e";
   runButton.disable = false;
