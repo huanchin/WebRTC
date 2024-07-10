@@ -260,7 +260,7 @@ function startShareScreen() {
     .then((stream) => {
       sharedStream = stream;
       shareState = 1;
-      document.getElementById("shareControl").style.color = "#fd6f13";
+      document.getElementById("shareControl").style.color = "#979d6e";
       // var peerToCall = Object.keys(peerList) + "";
       // const peerArray = peerToCall.split(",");
       const peerArray = Object.keys(peerList);
@@ -320,7 +320,7 @@ async function startRecording() {
       },
     });
     recordState = 0;
-    document.getElementById("recordControl").style.color = "#fd6f13";
+    document.getElementById("recordControl").style.color = "#979d6e";
   } catch (err) {
     console.error(err);
   }
@@ -529,7 +529,7 @@ languageSelect.addEventListener("change", () => {
 runButton.addEventListener("click", () => {
   console.log("run code");
   runButton.textContent = "loading...";
-  runButton.style.backgroundColor = "#e89964";
+  runButton.style.backgroundColor = "#d0d4b9";
   runButton.disable = true;
   const code = window.editor.getValue();
   const language = languageSelect.value;
@@ -540,7 +540,7 @@ runButton.addEventListener("click", () => {
 socket.on("output", (output) => {
   console.log("run code output");
   runButton.textContent = "Run";
-  runButton.style.backgroundColor = "#fd6f13";
+  runButton.style.backgroundColor = "#979d6e";
   runButton.disable = false;
   outputElement.innerHTML = output.replace(/\n/g, "<br>");
 });
