@@ -124,7 +124,7 @@ app.use("/room/:room", (req, res, next) => {
   const roomID = req.params.room;
   console.log(roomID);
   if (req.session.room !== roomID) {
-    return res.redirect(`/room?room=${roomID}`);
+    return res.redirect(`/?room=${roomID}`);
   }
   next();
 });
@@ -204,14 +204,14 @@ io.on("connection", (socket) => {
       switch (language) {
         case "python":
           timeoutCommand = `timeout ${timeoutDuration}`;
-          command = `${timeoutCommand} docker run --rm python:3.12.4-alpine3.20 python -c "${code.replace(
+          command = `${timeoutCommand} docker run --cpu-period=100000 --cpu-quota=50000 --rm python:3.12.4-alpine3.20 python -c "${code.replace(
             /"/g,
             '\\"'
           )}"`;
           break;
         case "javascript":
           timeoutCommand = `timeout ${timeoutDuration}`;
-          command = `${timeoutCommand} docker run --rm node:20.15.1-alpine3.19 sh -c "node -e '${code.replace(
+          command = `${timeoutCommand} docker run --cpu-period=100000 --cpu-quota=50000 --rm node:20.15.1-alpine3.19 sh -c "node -e '${code.replace(
             /"/g,
             '\\"'
           )}'"`;
