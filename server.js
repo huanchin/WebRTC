@@ -57,7 +57,7 @@ app.get("/newroom", (req, res) => {
   un = req.query.username;
   pc = req.query.passcode;
   const roomId = uuidv4();
-  redis.set(roomId, pc);
+  redis.set(roomId, pc, "EX", 86400);
   // fs.appendFileSync(
   //   "public/meeting-log.txt",
   //   roomId + ":" + pc + "\n",
