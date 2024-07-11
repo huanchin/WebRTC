@@ -6,11 +6,15 @@ const Y = require("yjs");
 const app = express();
 const server = require("http").Server(app);
 const fs = require("fs");
-server.listen(process.env.PORT || 8000);
+const PORT = 8000;
+server.listen(PORT, () => {
+  console.log(`server is running on port ${PORT}`);
+});
 
 const redis = new Redis({
   host: "webrtc-redis-cache.9k4snd.ng.0001.apse2.cache.amazonaws.com",
 });
+// const redis = new Redis();
 
 /*** 1) serve the home page ***/
 app.use(express.static("public"));
@@ -63,7 +67,7 @@ app.get("/newroom", (req, res) => {
   req.session.room = roomId;
   req.session.username = un;
   console.log(req.session.room);
-  res.redirect(`/${roomId}`);
+  res.redirect(`/room/${roomId}`);
 });
 
 //*** 3) handle join room route ***/
@@ -109,33 +113,23 @@ app.get("/joinroom", (req, res) => {
       pc = passcode;
       req.session.room = invitation;
       req.session.username = username;
-      res.redirect(`/${invitation}`);
+      res.redirect(`/room/${invitation}`);
     }
   });
 });
 
 //*** 2) handle room route ***/
 // 中间件：检查用户是否已经访问过 /newroom 或 /joinroom
-app.use("/:room", (req, res, next) => {
+app.use("/room/:room", (req, res, next) => {
   const roomID = req.params.room;
   console.log(roomID);
-  if (roomID === "upload") {
-    const fileName = req.headers["file-name"];
-    req.on("data", (chunk) => {
-      fs.appendFileSync(
-        __dirname + "/public/uploaded-files/" + fileName,
-        chunk
-      );
-    });
-    return res.end("uploaded");
-  }
   if (req.session.room !== roomID) {
-    return res.redirect(`/?room=${roomID}`);
+    return res.redirect(`/room?room=${roomID}`);
   }
   next();
 });
 
-app.get("/:room", (req, res) => {
+app.get("/room/:room", (req, res) => {
   res.render("meeting-room", {
     roomId: req.params.room,
     username: req.session.username,
@@ -144,14 +138,14 @@ app.get("/:room", (req, res) => {
 });
 
 /***  when file upload route ***/
-// app.post("/upload", (req, res) => {
-//   console.log("__dirname");
-//   const fileName = req.headers["file-name"];
-//   req.on("data", (chunk) => {
-//     fs.appendFileSync(__dirname + "/public/uploaded-files/" + fileName, chunk);
-//   });
-//   res.end("uploaded");
-// });
+app.post("/upload", (req, res) => {
+  console.log("__dirname");
+  const fileName = req.headers["file-name"];
+  req.on("data", (chunk) => {
+    fs.appendFileSync(__dirname + "/public/uploaded-files/" + fileName, chunk);
+  });
+  res.end("uploaded");
+});
 
 /**** Setting Up Socket.IO ****/
 const io = require("socket.io")(server);

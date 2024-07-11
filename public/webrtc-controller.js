@@ -528,9 +528,12 @@ languageSelect.addEventListener("change", () => {
 // Event listener for the run button
 runButton.addEventListener("click", () => {
   console.log("run code");
+  // disable button
   runButton.textContent = "loading...";
   runButton.style.backgroundColor = "#d0d4b9";
   runButton.disable = true;
+
+  // get code and send to backend
   const code = window.editor.getValue();
   const language = languageSelect.value;
   socket.emit("runCode", code, language);
@@ -539,9 +542,13 @@ runButton.addEventListener("click", () => {
 // Receiving output from the server
 socket.on("output", (output) => {
   console.log(output);
+
+  // enable button
   runButton.textContent = "Run";
   runButton.style.backgroundColor = "#979d6e";
   runButton.disable = false;
+
+  // render output
   if (output.includes("context canceled")) {
     outputElement.innerHTML = "<p>Execution timed out</p>";
     return;
