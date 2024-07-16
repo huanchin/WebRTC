@@ -372,6 +372,10 @@ text.addEventListener("keydown", (e) => {
   let minute = new Date().getMinutes();
   minute = ("0" + minute).slice(-2);
   const time = hour + "." + minute;
+  if (text.value.length === 0) {
+    document.querySelector("#file").value = null;
+    uploadState = 0;
+  }
   if (e.which == 13 && text.value.length !== 0) {
     socket.emit("message", text.value, USERNAME, RANDOM_COLOR, time);
     text.value = "";
@@ -433,7 +437,7 @@ function scrollToBottom() {
 
 /*** File sharing ***/
 function selectFile(val) {
-  var filename = val.replace(/C:\\fakepath\\/i, "");
+  const filename = val.replace(/C:\\fakepath\\/i, "");
   document.getElementById("textchat").value = filename;
   uploadState = 1;
 }
