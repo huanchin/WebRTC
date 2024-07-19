@@ -1,18 +1,23 @@
 const express = require("express");
+const fs = require("fs");
 const session = require("express-session");
 const { exec } = require("child_process");
 const Redis = require("ioredis");
 const Y = require("yjs");
+const dotenv = require("dotenv");
+
+dotenv.config();
 const app = express();
 const server = require("http").Server(app);
-const fs = require("fs");
-const PORT = 8000;
+
+const PORT = process.env.PORT;
+
 server.listen(PORT, () => {
   console.log(`server is running on port ${PORT}`);
 });
 
 const redis = new Redis({
-  host: "webrtc-redis-cache.9k4snd.ng.0001.apse2.cache.amazonaws.com",
+  host: process.env.REDIS_HOST,
 });
 // const redis = new Redis();
 
@@ -22,13 +27,13 @@ app.set("view engine", "ejs");
 
 app.set("trust proxy", true);
 
-// 配置 session 中间件
+// 配置 session middleware
 app.use(
   session({
-    secret: "your_secret_key", // 请使用一个强随机生成的字符串
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: true,
-    cookie: { secure: false }, // 如果你使用 HTTPS，请设置为 true
+    cookie: { secure: false }, // 使用 HTTPS，則設置為 true
   })
 );
 
@@ -245,3 +250,5 @@ io.on("connection", (socket) => {
     });
   });
 });
+
+module.exports = { server, io };
